@@ -8,32 +8,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <style>
-        @media (max-width: 768px) {
-            .form-container {
-                width: 95% !important;
-                padding: 5% !important;
-                margin: auto;
-                position: relative;
-            }
-
-            h2 {
-                font-size: 22px !important;
-            }
-
-            .form-control,
-            .form-select {
-                font-size: 16px !important;
-                padding: 10px !important;
-                text-align: center !important;
-            }
-
-            /* Ottimizza le colonne su mobile */
-            .row .col-md-4,
-            .row .col-md-6 {
-                width: 100% !important; /* Imposta i campi a larghezza piena */
-            }
-        }
-
         /* Sfondo con immagine */
         body {
             font-family: 'Arial', sans-serif;
@@ -50,9 +24,9 @@
         .form-container {
             background: rgba(255, 255, 255, 0.15); /* Trasparente */
             backdrop-filter: blur(10px); /* Sfocatura per effetto vetro */
-            padding: 1.5%;
+            padding: 30px;
             border-radius: 15px;
-            width: 65%;
+            width: 550px;
             box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.3);
             text-align: center;
         }
@@ -136,16 +110,13 @@
             text-align: left;
         }
         .form-label {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: block;
-            font-size: 14px;
-            font-weight: bold;
-        }
-        .form-label {
-            margin-top: .8rem;
-        }
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    font-size: 14px;
+    font-weight: bold;
+}
     </style>
 
     <script>
@@ -162,55 +133,23 @@
         function validateAndPrepareData() {
             let formData = {};
             let errorMessages = [];
-            let defaultWarnings = [];
-            let limitWarnings = [];
 
-            const fieldLabels = {
-                "age": "Età",
-                "balance": "Saldo Bancario",
-                "day_of_week": "Giorno della Settimana",
-                "duration": "Durata Chiamata",
-                "campaign": "Numero di Contatti",
-                "pdays": "Giorni dal Contatto Precedente",
-                "previous": "Numero Contatti Precedenti"
-            };
-
+            // Controllo campi numerici
             Object.keys(numericLimits).forEach(field => {
                 let inputField = document.getElementById(field);
                 let value = parseFloat(inputField.value);
-                let usedDefault = false; // Flag per capire se è stato usato il valore predefinito
-                let correctedValue = null; // Flag per valore fuori limite
 
                 if (isNaN(value)) {
                     value = numericLimits[field].default;  // Usa il valore predefinito se il campo è vuoto
-                    usedDefault = true;
                 } else if (value < numericLimits[field].min) {
-                    correctedValue = numericLimits[field].min;  // Imposta il minimo se sotto soglia
+                    value = numericLimits[field].min;  // Imposta il minimo se sotto soglia
                 } else if (value > numericLimits[field].max) {
-                    correctedValue = numericLimits[field].max;  // Imposta il massimo se sopra soglia
-                }
-
-                // Se il valore è stato corretto, avvisa l'utente
-                if (correctedValue !== null) {
-                    let fieldName = fieldLabels[field] || field;
-                    limitWarnings.push(`${fieldName} fuori dal range limite → reimpostato a: ${correctedValue}`);
-                    value = correctedValue; // Applica il valore corretto
+                    value = numericLimits[field].max;  // Imposta il massimo se sopra soglia
                 }
 
                 inputField.value = value;  // Aggiorna il valore nel form
                 formData[field] = value;
-
-                // Se è stato usato un valore predefinito, aggiungilo alla lista di avvisi
-                if (usedDefault) {
-                    let fieldName = fieldLabels[field] || field;
-                    defaultWarnings.push(`${fieldName} non inserito → impostato valore di default: ${value}`);
-                }
             });
-
-            let warningMessages = [...defaultWarnings, ...limitWarnings];
-            if (warningMessages.length > 0) {
-                alert("Alcuni campi sono stati modificati automaticamente:\n\n" + warningMessages.join("\n"));
-            }
 
             // Controllo campi categorici (OBBLIGATORI)
             let categoricalFields = ["job", "marital", "education", "default", "housing", "loan", "contact", "month", "poutcome"];
@@ -219,7 +158,7 @@
                 let value = selectField.value;
 
                 if (!value) {
-                    errorMessages.push(`Seleziona un valore per ${field}`);
+                    errorMessages.push(`⚠️ Seleziona un valore per ${field}`);
                 }
 
                 formData[field] = value;
@@ -272,9 +211,9 @@
 
             // Determina il messaggio in base alla predizione
             if (result.prediction === 1) {
-                message = `Il cliente potrebbe sottoscrivere il contratto, probabilità di successo del ${probability}%`;
+                message = `Il cliente sottoscriverà il contratto, probabilità del ${probability}%`;
             } else {
-                message = `Il cliente NON sottoscriverà il contratto, probabilità di successo del ${probability}%`;
+                message = `Il cliente NON sottoscriverà il contratto, probabilità del ${probability}%`;
             }
 
             // Mostra il risultato
@@ -297,18 +236,18 @@
         
             <!-- Saldo (numerico) -->
             <div class="col-md-4">
-                <label class="form-label text-white">Saldo Bancario</label>
+                <label class="form-label text-white">Saldo Bancario:</label>
                 <input type="number" id="balance" class="form-control" min="-5000" max="50000" placeholder="">
             </div>
         
             <!-- Durata della chiamata -->
             <div class="col-md-4">
-                <label class="form-label text-white">Durata Chiamata (secondi)</label>
+                <label class="form-label text-white">Durata Chiamata (sec):</label>
                 <input type="number" id="duration" class="form-control" min="0" max="5000" placeholder="">
             </div>
         </div>
         
-        <div class="row">
+        <div class="row mt-2">
             <!-- Stato  -->
             <div class="col-md-4">
                 <label class="form-label text-white">Stato</label>
@@ -367,9 +306,15 @@
                     <option value="yes">Sì</option>
                 </select>
             </div>
+
+            <!-- Giorno della Settimana -->
+            <div class="col-md-4">
+                <label class="form-label text-white">Giorno della Mese</label>
+                <input type="number" id="day_of_week" class="form-control" min="1" max="31" placeholder="Numero">
+            </div>
         </div>
         
-        <div class="row">
+        <div class="row mt-2">
             <!-- Mese -->
             <div class="col-md-4">
                 <label class="form-label text-white">Mese</label>
@@ -407,7 +352,7 @@
             </div>
         </div>
         
-        <div class="row">
+        <div class="row mt-2">
             <!-- Giorni dal Contatto Precedente -->
             <div class="col-md-4">
                 <label class="form-label text-white">Giorni dal Contatto Precedente</label>
@@ -438,15 +383,6 @@
             </select>
         </div>
     </div>
-    
-    <div class="row">
-        <!-- Giorno della Settimana -->
-        <div class="col-md-4">
-            <label class="form-label text-white">Giorno della Mese</label>
-            <input type="number" id="day_of_week" class="form-control" min="1" max="31" placeholder="Numero">
-        </div>
-    </div>
-
         <!-- Bottone centrato sotto -->
         <div class="row mt-3">
             <div class="col-md-12 text-center">
